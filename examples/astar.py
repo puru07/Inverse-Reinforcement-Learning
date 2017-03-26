@@ -6,23 +6,19 @@ from Node import node
 import Node 
 
 
-def init(door_r, arm_r, robo_dim, arena, desc):
-	node.door_r = door_r
-	node.arm_r = arm_r
-	node.Width = robo_dim[0]
-	node.Len = robo_dim[1]
+def init(arena):
+
 	node.arena_W = arena[0]
 	node.arena_L = arena[1]
-	node.dx = desc[0]
-	node.dy = desc[1]
-def astar(start,goal,weight):
-	print 	node.door_r ,node.arm_r , node.Width , node.Len ,node.arena_W , node.arena_L 
+
+def astar(start,goal,weight, r_map):
+	#print 	node.door_r ,node.arm_r , node.Width , node.Len ,node.arena_W , node.arena_L 
 	closelist = {}
 	openlist = pq()
 	openlist_f = {}
 	gstart = 0
 	parent_start = 0
-	start_node = node(start[0],start[1],start[2],0,0,0,gstart,parent_start)
+	start_node = node(start[0],start[1],gstart,parent_start)
 	openlist.put((Node.getCost(start_node,weight),start_node))
 	openlist_f[start_node.gethashKey()] = start_node
 	while (openlist.qsize()>0):

@@ -16,25 +16,15 @@ class node:
 	dy = Len/4
 
 
-	def __init__(self,x,y,theta,d,h,v,gcost,parentkey):
+	def __init__(self,x,y,gcost,parentkey):
 		self.x = x
 		self.y = y
-		self.theta = theta
-		self.d = d 		# 0: closed, 1: open 2: overlap, door interval
-		self.h = h 		# 0: Outside, 1: inside	, side of the door in contact
-		self.v = v 		# 0: Arm , 1: base , part of robot in contact
 		self.parentkey = parentkey 
 		self.gcost = gcost
-		self.hcost = self.getHcost()
+		#self.hcost = self.getHcost()
 
 	def getSuccs(self):
-		# transitions in SECOND primitives
-		# (h,v) ==(0,1) -> NOT possible, holding door by base from outside
-		# (1,1) -> special case, (1,0)-> final/goal case: arm from inside, 
-		# (0,0)-> initial state
 
-		# the only transition possible when in contact with base from inside
-		#transition from base to arm 
 		if (self.h == 1 and self.v == 1 and self.d == 1):
 			vnew = 0
 			tempNode = node(self.x,self.y,self.theta,self.d,self.h,vnew,\
@@ -108,56 +98,6 @@ class node:
 
 		return succs
 
-# Motion primitive / variants for each change in pose
-	def variants(self,item,action):
-		succs = []
-		tempNode = node(item[0],item[1],item[2],self.d,self.h,self.v,\
-					self.gcost,self.gethashKey())
-		tempNode2 = tempNode
-
-		if tempNode.outDoorsweep():		# if it could be fully open
-			
-			if self.d == 2:				# if it already could be fully open
-				action = 0
-				tempNode.gcost += tempNode.getTCost(action)
-				if tempNode.stateIsvalid():
-					succs += [tempNode]
-			if self.d == 0 : 			#if it was in closed interval
-				dnew = 2
-				action = 0
-				tempNode.gcost += tempNode.getTCost(action)
-				tempNode.d = dnew
-				if tempNode.stateIsvalid():
-					succs += [tempNode]
-			if self.d == 1 and self.v == 0:			# if it was in open interval, held by arm
-				dnew = 2
-				action = 0
-				tempNode.gcost += tempNode.getTCost(action)
-				tempNode.d = dnew
-				if tempNode.stateIsvalid():
-					succs += [tempNode]
-			#printNode(tempNode)
-
-		else :		#if door cannot be fully open now
-			if self.d == 2 :		# if it was fully openable in past
-				# checking if it could be in open interval now 
-				# NOTE: for door pulling case
-				dnew = 1
-				action = 0
-				tempNode.d = dnew
-				tempNode.gcost += tempNode.getTCost(action)
-				if tempNode.stateIsvalid():
-					succs += [tempNode]
-			else : 		# let the door interval remain the same
-				action = 0
-				tempNode.gcost += tempNode.getTCost(action)
-				if tempNode.stateIsvalid():
-					succs += [tempNode]
-		
-
-		return succs
-
-
 	def getHcost(self):
 		rlen =  node.door_r
 		posR = math.hypot(self.x, self.y)
@@ -171,8 +111,7 @@ class node:
 		return cost1 + cost2
 
 	def gethashKey(self):
-		haskey = self.x*100000 + self.y*10000 + self.theta*1000 + self.d*100 \
-				+ self.h*10 + self.v
+		haskey = self.x*10 + self.y
 		return int(haskey)
 
 	def getTCost(self, action):		# Cost of the transition
@@ -192,36 +131,6 @@ class node:
 			cost += 1
 
 		return cost
-	def getFeasibleAngle(self):
-		
-		
-		if self.d == 0:
-			roboAngle = round(math.atan2((self.y + node.Len),(self.x - node.Width))*100)/100	# accounting for robo size
-			return [0, roboAngle]
-		elif self.d == 1:
-			if self.y ==0:
-				return [0,1.57]
-			elif self.x == 0:
-				return [1.57,1.57] 
-			roboAngle = round(math.atan2((self.y - node.Len),(self.x + node.Width))*100)/100	# accounting for robo size
-			return [roboAngle,1.57]
-		else:
-			return [0,1.57]
-
-	def outDoorsweep(self):
-		# true if d = 2 is possible
-		if self.y >= 0:
-			if self.d == 2 or self.d == 1:
-				return True
-		if math.hypot(self.x + node.Width/2, self.y  + node.Len/2) < node.door_r:
-			return False
-		# if self.x+ self.y + node.door_r > 0: 		# approximation of single line
-		# 	return False
-		# elif (self.x +node.Width/2  > -1*node.door_r - node.arm_r or \
-		# 		self.y + node.Len/2 > -1*node.door_r - node.arm_r) :
-		# 	return False 
-		else:
-			return True
 
 	def stateIsvalid(self):
 		#checking for arena constraints
@@ -276,13 +185,10 @@ class node:
 		return True
 
 def getSatefromKey(key):
-	x = key//100000
-	y = (key-x*100000)//10000
-	theta = (key - x*100000 - y*10000)//1000
-	d = (key - x*100000 - y*10000 - theta*1000)//100
-	h = (key - x*100000 - y*10000 - theta*1000 - d*100)//10
-	v = (key - x*100000 - y*10000 - theta*1000 - d*100 - h*10)
-	return [x,y,theta,d,h,v]
+	x = key//10
+	y = (key-x*10)
+
+	return [x,y]
 
 def getCost(Node, Weight):
 	return (Weight*Node.getHcost() + Node.gcost)
