@@ -16,11 +16,21 @@ import irl.mdp.gridworld as gridworld
 
 grid_size = 7
 traj_len = 10
-traj = parser.getTraj(0,16)
-rmap = trainer.trainer(grid_size,traj,17)
-astar.init([grid_size,grid_size])
-out = astar.astar([0,0],rmap,traj_len)
+try :
+	rmap = np.load('rmap.npy')
+	print "reward map loaded, astar started"
+except 	IOError:
+	print "no saved reward map found, training....."
+	traj = parser.getTraj(0,16,4)
+	print "got the traj"
+	rmap = trainer.trainer(grid_size,traj,17, traj_len)
+	np.save('rmap',rmap)
+	print "training done, rmap extracted, astar started"
 
+
+astar.init([grid_size,grid_size])
+out = astar.astar([0,0],rmap*(-1),traj_len)
+print "astar done with 00 as start"
 # getting the tree out
 print "figuring out the tree"
 node_list = out[1]

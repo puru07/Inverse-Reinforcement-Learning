@@ -2,9 +2,8 @@ try:
 	from Queue import PriorityQueue as pq
 except: 
 	from queue import PriorityQueue as pq
-from Node import node
-import Node 
 
+import numpy as np
 class node:
 
 	# dimensions of the arena
@@ -16,29 +15,29 @@ class node:
 		self.y = y
 		self.parentkey = parentkey 
 		self.childnum = childnum +1
-		self.gcost = gcost + r_map[x][y]
+		self.gcost = gcost 
 
 	def getSuccs(self, r_map):
 		x = self.x
 		y = self.y
 		# list of successors to be returned
 		succs = [] 
-		if x + 1 < arena_W +1:
-			succs += node(x+1,y self.gcost,self.gethashKey(),self.childnum)
+		if x + 1 < node.arena_W +1:
+			succs.append(node(x+1,y ,self.gcost+ r_map[x+1][y],self.gethashKey(),self.childnum))
 		if x-1 >-1 :
-			succs += node(x-1,y self.gcost,self.gethashKey(),self.childnum)
-		if y + 1 < arena_L +1 :
-			succs += node(x,y+1 self.gcost,self.gethashKey(),self.childnum)
+			succs.append(node(x-1,y ,self.gcost+ r_map[x-1][y],self.gethashKey(),self.childnum))
+		if y + 1 < node.arena_L +1 :
+			succs.append(node(x,y+1 ,self.gcost+ r_map[x][y+1],self.gethashKey(),self.childnum))
 		if y-1 > -1:
-			succs += node(x,y-1 self.gcost,self.gethashKey(),self.childnum)
+			succs.append(node(x,y-1 ,self.gcost+ r_map[x][y-1],self.gethashKey(),self.childnum))
 		return succs
 	def gethashKey(self):
 		haskey = self.x*100 + self.y
 		return int(haskey)
 
 
-def getCost(Node, Weight):
-	return (Weight*Node.getHcost() + Node.gcost)
+# def getCost(Node, Weight):
+# 	return (Weight*Node.getHcost() + Node.gcost)
 
 def getSatefromKey(key):
 	x = key//100
@@ -59,7 +58,7 @@ def astar(start,r_map, traj_lim):
 	parent_start = 0
 	childnum = -1
 	start_node = node(start[0],start[1],gstart,parent_start,childnum)
-	openlist.put((Node.getCost(start_node,weight),start_node))
+	openlist.put((start_node.gcost,start_node))
 	openlist_f[start_node.gethashKey()] = start_node
 
 	while (openlist.qsize()>0):
@@ -76,16 +75,14 @@ def astar(start,r_map, traj_lim):
 		#checking if the node2exp is the goal
 		if node2exp.childnum == traj_lim :
 			print 'goal reached via hcost'
-			Node.printNode(node2exp)
-			print node2exp.getFeasibleAngle()
 			print 'number of expansions'
 			print len(closelist)
 			print 'teh cost'
-			print Node.getCost(node2exp, weight)	
+			print node2exp.gcost	
 			return [node2exp,closelist]
 
 		#expanding the node
-		succs = node2exp.getSuccs()
+		succs = node2exp.getSuccs(r_map)
 		# print 'number of succs'
 		# print len(succs)
 		for item in succs:

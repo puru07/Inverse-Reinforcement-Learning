@@ -1,3 +1,11 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+import irl.maxent as maxent
+import irl.mdp.gridworld as gridworld
+
+import parser 
+
 
 def trainer(grid_size, trajectories, ndata, traj_len):
 	trajectory_length = traj_len   		#length of one traj
@@ -8,7 +16,7 @@ def trainer(grid_size, trajectories, ndata, traj_len):
 	n_actions = 4;         			#number of actions
 
 	"""transition probability"""
-	transition_probability = defineProb(grid_size, n_actions)
+	transition_probability = parser.defineProb(grid_size, n_actions)
 
 	"""feature matrix ident type"""
 	feature_matrix = []
@@ -27,16 +35,15 @@ def trainer(grid_size, trajectories, ndata, traj_len):
 	np.array(transition_probability), np.array(trajectories), epochs, learning_rate)
 
 	# """plot the result"""
-	plt.subplot(1, 2, 1)
-	plt.pcolor(gr_array)
-	plt.colorbar()
-	plt.title("origin map")
+	# plt.subplot(1, 2, 1)
+	# #plt.pcolor(gr_array)
+	# #plt.colorbar()
+	# plt.title("origin map")
 
-	plt.subplot(1, 2, 2)
-	plt.pcolor(r.reshape((grid_size, grid_size)))
-	plt.colorbar()
-	plt.title("learned reward")
+	# plt.subplot(1, 2, 2)
+	# plt.pcolor(r.reshape((grid_size, grid_size)))
+	# plt.colorbar()
+	# plt.title("learned reward")
 
-	plt.show()
-
-	return r.reshape((grid_size, grid_size)
+	# plt.show()
+	return r.reshape((grid_size, grid_size))
