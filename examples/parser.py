@@ -56,16 +56,7 @@ def defineProb(grid_size, n_actions):
 	for i in range(n_states)]
 	return res
 
-def main(fileNum, mapId):
-
-	"""learning parameters"""
-	trajectory_length = 10   #length of one traj
-	discount = 0.1         #discount past
-	n_trajectories = 21     #number of traj
-	epochs = 200            #iteration times
-	learning_rate = 0.1    #learning rate
-	n_actions = 4;          #number of actions
-
+def getTraj(startfileNum, fileNum, mapId):
 	"""the target map matrix"""
 	f = open("./data/aimap4.txt")
 	line = f.readline()
@@ -91,7 +82,7 @@ def main(fileNum, mapId):
 
 	"""trajectory matrix stored in the file"""
 	trajectories = []
-	for fi in range(0, fileNum + 1):
+	for fi in range(startfileNum, fileNum + 1):
 		fname = "./data/aidata" + str(fi) + ".txt"
 		f = open(fname)
 		line = f.readline()
@@ -122,7 +113,20 @@ def main(fileNum, mapId):
 		trajectories.append(ftraj)
 		print "Parsed file: " + fname
 		#print np.array(trajectories)
-	
+
+	return trajectories
+
+
+def main(fileNum, mapId):
+	# learning parameters 
+	trajectory_length = 10  	# length of one traj
+	discount = 0.1         		#discount past
+	n_trajectories = 21     	#number of traj
+	epochs = 200            	#iteration times
+	learning_rate = 0.1    		#learning rate
+	n_actions = 4;          	#number of actions
+	trajectories = getTraj();
+
 	"""transition probability"""
 	transition_probability = defineProb(grid_size, n_actions)
 

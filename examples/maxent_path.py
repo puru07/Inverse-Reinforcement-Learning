@@ -48,7 +48,9 @@ def main(grid_size, discount, n_trajectories, epochs, learning_rate):
 
     # getting the path
     astar.init([grid_size,grid_size])
-    path= astar.astar(start, goal, w, r);
+    start = [0,0]
+    path= astar.astar(start,r,3*grid_size);
+    
 
 if __name__ == '__main__':
     main(5, 0.01, 20, 200, 0.01)
