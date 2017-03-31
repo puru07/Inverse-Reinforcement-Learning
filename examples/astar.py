@@ -101,6 +101,12 @@ def astar(start,r_map, traj_lim):
 		#del openlist_f[node2exp.gethashKey()]
 
 	return 0
+def printNode(node):
+
+	print node.x, node.y
+	#print Node.gethashKey()
+
+	return 0
 
 
 #  the main function

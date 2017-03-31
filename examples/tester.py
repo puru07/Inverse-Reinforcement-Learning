@@ -45,7 +45,7 @@ while True:
 		break
 	newnode = node_list[pkey]
 	tree += [newnode]
-	#astar.printNode(newnode)
+	astar.printNode(newnode)
 	currNode = newnode
 print 'size of the path is'
 print len(tree)
