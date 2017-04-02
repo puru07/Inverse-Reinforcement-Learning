@@ -55,7 +55,7 @@ def astar(start,r_map, traj_lim):
 	openlist = pq()
 	openlist_f = {}
 	gstart = 0
-	parent_start = 0
+	parent_start = -1
 	childnum = -1
 	start_node = node(start[0],start[1],gstart,parent_start,childnum)
 	openlist.put((start_node.gcost,start_node))

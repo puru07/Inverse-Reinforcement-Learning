@@ -24,26 +24,19 @@ def print_rmap(rmap):
 def print_traj(traj):
 	for row in traj[0]:
 		print parser.abs2xy(row[0])
-def gettree(astar_out,start):
-	# getting the tree out
+def getnextstate(astar_out,start):
+	# getting the key of the starting node
 	snode = astar.node(start[0],start[1],0,0,-1)
 	skey = snode.gethashKey();
-	node_list = out[1]
-	currNode = out[0]
-	tree = []
-	tree += [currNode]
-	# print "\n the astar tree is"
-	while True:
-		pkey = currNode.parentkey
+	# getting the list of nodes out
+	nodeList = astar_out[1].values()
+
+	for node in nodeList:
+		pkey = node.parentkey
 		if pkey == skey:
 			
 			break
-		newnode = node_list[pkey]
-		tree += [newnode]
-		# astar.printNode(newnode)
-		currNode = newnode
-
-	return tree
+	return node
 
 grid_size = 7
 traj_len = 10
@@ -62,7 +55,9 @@ except 	IOError:
 astar.init([grid_size,grid_size])
 
 # getting the trrajectory to be tested
-testtraj = parser.getTraj(17,17,4)
+tstart = 17
+tend = 20
+testtraj = parser.getTraj(tstart,tend,4)
 print_traj(testtraj)
 # rounding off and negating the reward map for dijkstra to work on it
 rmap = np.round(rmap*(-1),decimals=2)
@@ -70,21 +65,22 @@ rmap = np.round(rmap*(-1),decimals=2)
 # print_rmap(rmap)
 correct = 0
 total = 0
-start = parser.abs2xy(testtraj[0][0][0])
-for row in testtraj[0][1:]:
-	next_state = row[0]
-	print "true state is ",  parser.abs2xy(next_state)
-	out = astar.astar(start,rmap,traj_len)
-	tree = gettree(out,start)
-	start = parser.abs2xy(next_state)
-	pred_state = parser.xy2abs([tree[-1].x,tree[-1].y])
-	print "predicted state is ", tree[-1].x ,tree[-1].y
-	total += 1
-	if pred_state == next_state:
-		correct += 1
-
+for itraj in range(tend - tstart +1) :
+	start = parser.abs2xy(testtraj[itraj][0][0])
+	for row in testtraj[itraj][1:]:
+		next_state = row[0]
+		print "true state is ",  parser.abs2xy(next_state)
+		out = astar.astar(start,rmap,traj_len)
+		pred_node = getnextstate(out,start)
+		pred_state = parser.xy2abs([pred_node.x,pred_node.y])
+		print "predicted state is ", pred_node.x ,pred_node.y
+		total += 1
+		if pred_state == next_state:
+			correct += 1
+		start = parser.abs2xy(next_state)
 
 print "the total number of states tested : ", total 
 print "the correct predictions are: ", correct
+print "percentage accuracy is ", correct*100/total
 
 
