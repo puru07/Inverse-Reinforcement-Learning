@@ -29,6 +29,7 @@ except 	IOError:
 
 
 astar.init([grid_size,grid_size])
+
 out = astar.astar([0,0],rmap*(-1),traj_len)
 print "astar done with 00 as start"
 # getting the tree out
@@ -37,7 +38,12 @@ node_list = out[1]
 currNode = out[0]
 tree = []
 tree += [currNode]
-
+print "rmap is "
+for r in  range(grid_size):
+	for c in range(grid_size):
+		print rmap[r][c]*(-1),
+	print " \n"
+print "\n the astar tree is"
 while True:
 	pkey = currNode.parentkey
 	if pkey == 0:
@@ -49,5 +55,8 @@ while True:
 	currNode = newnode
 print 'size of the path is'
 print len(tree)
+plt.pcolor(rmap*(-1))
+plt.colorbar()
+plt.show()
 
 

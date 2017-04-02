@@ -22,14 +22,14 @@ class node:
 		y = self.y
 		# list of successors to be returned
 		succs = [] 
-		if x + 1 < node.arena_W +1:
-			succs.append(node(x+1,y ,self.gcost+ r_map[x+1][y],self.gethashKey(),self.childnum))
+		if x + 1 < node.arena_W :
+			succs.append(node(x+1,y ,self.gcost+ r_map[y][x+1],self.gethashKey(),self.childnum))
 		if x-1 >-1 :
-			succs.append(node(x-1,y ,self.gcost+ r_map[x-1][y],self.gethashKey(),self.childnum))
-		if y + 1 < node.arena_L +1 :
-			succs.append(node(x,y+1 ,self.gcost+ r_map[x][y+1],self.gethashKey(),self.childnum))
+			succs.append(node(x-1,y ,self.gcost+ r_map[y][x-1],self.gethashKey(),self.childnum))
+		if y + 1 < node.arena_L  :
+			succs.append(node(x,y+1 ,self.gcost+ r_map[y+1][x],self.gethashKey(),self.childnum))
 		if y-1 > -1:
-			succs.append(node(x,y-1 ,self.gcost+ r_map[x][y-1],self.gethashKey(),self.childnum))
+			succs.append(node(x,y-1 ,self.gcost+ r_map[y-1][x],self.gethashKey(),self.childnum))
 		return succs
 	def gethashKey(self):
 		haskey = self.x*100 + self.y
