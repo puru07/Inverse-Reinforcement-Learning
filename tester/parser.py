@@ -13,7 +13,7 @@ def xy2abs(xy):
 	return xy[0] + xy[1] * 7
 
 def abs2xy(a):
-	return (a % 7, a // 7)
+	return [a % 7, a // 7]
 
 def getAction(cur, next):
 	"""0 -> ; 2 <-; 3 down; 1 up"""

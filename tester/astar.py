@@ -74,11 +74,11 @@ def astar(start,r_map, traj_lim):
 		#printNode(node2exp)
 		#checking if the node2exp is the goal
 		if node2exp.childnum == traj_lim :
-			print 'goal reached via hcost'
-			print 'number of expansions'
-			print len(closelist)
-			print 'teh cost'
-			print node2exp.gcost	
+			# print 'goal reached via hcost'
+			# print 'number of expansions'
+			# print len(closelist)
+			# print 'the cost'
+			# print node2exp.gcost	
 			return [node2exp,closelist]
 
 		#expanding the node
