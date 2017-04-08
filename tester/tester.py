@@ -3,9 +3,9 @@ Developer: Puru Rastogi
 Test the accuracy of path prediction
 Date: 3/26/2017
 """
-import parser
-import astar
-import trainer
+import support.parser as parser
+import support.astar as astar
+import support.trainer as trainer
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -38,31 +38,39 @@ def getnextstate(astar_out,start):
 			break
 	return node
 
-grid_size = 7
-traj_len = 10
+
+###############################################################
+#============= THE MAIN SCRIPT STARTS ==============
+traj_len = 0
 try :
 	rmap = np.load('rmap.npy')
-	print "reward map loaded, astar started"
+	print "reward map loaded"
 except 	IOError:
 	print "no saved reward map found, training....."
-	traj = parser.getTraj(0,16,4)
+	traj, grid_size = parser.getTraj(0,16,4)
+	traj_len = len(traj[0])
 	print "got the traj"
 	rmap = trainer.trainer(grid_size,traj,17, traj_len)
 	np.save('rmap',rmap)
 	print "training done, rmap extracted, astar started"
 
-# intiating dikstra 
-astar.init([grid_size,grid_size])
+
 
 # getting the trrajectory to be tested
 tstart = 17
 tend = 20
-testtraj = parser.getTraj(tstart,tend,4)
-print_traj(testtraj)
+testtraj, grid_size = parser.getTraj(tstart,tend,4)
+if traj_len ==0:
+	traj_len = len(testtraj[0])
+#print_traj(testtraj)
+
 # rounding off and negating the reward map for dijkstra to work on it
 rmap = np.round(rmap*(-1),decimals=2)
-
 # print_rmap(rmap)
+
+# intiating dikstra 
+astar.init([grid_size,grid_size])
+
 correct = 0
 total = 0
 for itraj in range(tend - tstart +1) :

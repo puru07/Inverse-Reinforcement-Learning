@@ -114,7 +114,7 @@ def getTraj(startfileNum, fileNum, mapId):
 		print "Parsed file: " + fname
 		#print np.array(trajectories)
 
-	return trajectories
+	return (trajectories, grid_size)
 
 
 def main(fileNum, mapId):

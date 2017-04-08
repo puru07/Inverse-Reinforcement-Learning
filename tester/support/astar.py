@@ -62,29 +62,19 @@ def astar(start,r_map, traj_lim):
 	openlist_f[start_node.gethashKey()] = start_node
 
 	while (openlist.qsize()>0):
-		# print 'size of open list'
-		# print openlist.qsize()
+
 		# getting the node to expand 
 		LCNode = openlist.get()			# least cost node
 		node2exp = LCNode[1]
-		# print 'the hcost from different calls'
-		# print node2exp.hcost
-		# print node2exp.getHcost()
-		#print 'the node expand'
-		#printNode(node2exp)
+
 		#checking if the node2exp is the goal
 		if node2exp.childnum == traj_lim :
-			# print 'goal reached via hcost'
-			# print 'number of expansions'
-			# print len(closelist)
-			# print 'the cost'
-			# print node2exp.gcost	
+
 			return [node2exp,closelist]
 
 		#expanding the node
 		succs = node2exp.getSuccs(r_map)
-		# print 'number of succs'
-		# print len(succs)
+
 		for item in succs:
 			if item.gethashKey() in closelist:
 				# print 'duplicate ', item.gethashKey() , ' is the key'
