@@ -25,6 +25,8 @@ def getAction(cur, next):
 		return 0
 	if next[1] - cur[1] == 1:
 		return 3
+	if next[1] - cur[1] == 0 and next[0] - cur[0] ==0:
+		return 4
 	return 0
 
 def singleProb(i, j, k):
@@ -58,7 +60,7 @@ def defineProb(grid_size, n_actions):
 
 def getTraj(startfileNum, fileNum, mapId):
 	"""the target map matrix"""
-	f = open("./data/aimap4.txt")
+	f = open("./data/aimap5.txt")
 	line = f.readline()
 	grid_size = int(line[0:line.find(" ")])
 	n_states = grid_size * grid_size
@@ -85,25 +87,30 @@ def getTraj(startfileNum, fileNum, mapId):
 	for fi in range(startfileNum, fileNum + 1):
 		fname = "./data/aidata" + str(fi) + ".txt"
 		f = open(fname)
-		line = f.readline()
+		line = f.readline()	# grid_size
 		tralen = 0
 		ppos = []
 		ftraj = []
+		ncoins = 0
+
 		while line:
-			line = f.readline()
-			line = f.readline()
+			line = f.readline()		# step number
+			line = f.readline()		# position of the player --- line
 			# ----------------
-			ppos.append([int(line[3]), int(line[5])])
+			print line[3], line[5]
+			ppos.append([int(line[3]), int(line[5])])	# position of player
 			tralen = tralen + 1
 			# ----------------
-			line = f.readline()
-			line = f.readline()
-			line = f.readline()
-			line = f.readline()
+			line = f.readline()			# number of ghost
+			line = f.readline()			# number of coins ---- line
+			if ncoins == 0:
+				ncoins = int(line[3])			# number of coins
+			for coins in range(ncoins):
+				line = f.readline()
 			line = f.readline()
 			line = f.readline()
 		f.close()
-		ppos.append([5, 3])
+		ppos.append([6,0])
 		print "Trajectory length: " + str(tralen)
 
 		for i in range(0, tralen):

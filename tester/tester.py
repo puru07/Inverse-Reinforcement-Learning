@@ -47,18 +47,23 @@ try :
 	print "reward map loaded"
 except 	IOError:
 	print "no saved reward map found, training....."
-	traj, grid_size = parser.getTraj(0,16,4)
+	traj, grid_size = parser.getTraj(0,23,5)
 	traj_len = len(traj[0])
 	print "got the traj"
 	rmap = trainer.trainer(grid_size,traj,17, traj_len)
 	np.save('rmap',rmap)
 	print "training done, rmap extracted, astar started"
 
+#display the map
+plt.pcolor(rmap)
+plt.colorbar()
+plt.title("Recovered reward")
+plt.show()
 
 
 # getting the trrajectory to be tested
-tstart = 17
-tend = 20
+tstart = 24
+tend = 29
 testtraj, grid_size = parser.getTraj(tstart,tend,4)
 if traj_len ==0:
 	traj_len = len(testtraj[0])
