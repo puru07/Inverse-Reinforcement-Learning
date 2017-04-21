@@ -31,7 +31,7 @@ def main(grid_size, discount, n_trajectories, epochs, learning_rate):
     trajectories = gw.generate_trajectories(n_trajectories,
                                             trajectory_length,
                                             gw.optimal_policy)
-    feature_matrix = gw.feature_matrix("coord")
+    feature_matrix = gw.feature_matrix("proxi")
     ground_r = np.array([gw.reward(s) for s in range(gw.n_states)])
     r = maxent.irl(feature_matrix, gw.n_actions, discount,
         gw.transition_probability, trajectories, epochs, learning_rate)
@@ -47,4 +47,4 @@ def main(grid_size, discount, n_trajectories, epochs, learning_rate):
     plt.show()
 
 if __name__ == '__main__':
-    main(5, 0.01, 20, 200, 0.01)
+    main(10, 0.01, 20, 200, 0.01)

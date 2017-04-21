@@ -12,14 +12,15 @@ import irl.mdp.gridworld as gridworld
 
 import parser 
 
+def getfeature()
 
 def trainer(grid_size, trajectories, ndata, traj_len):
 	trajectory_length = traj_len   		#length of one traj
 	discount = 0.1        				#discount past
 	n_trajectories = ndata 		    	#number of traj
-	epochs = 200            			#iteration times
+	epochs = 200           			#iteration times
 	learning_rate = 0.1    				#learning rate
-	n_actions = 4;         				#number of actions
+	n_actions = 5;         				#number of actions
 
 	"""transition probability"""
 	transition_probability = parser.defineProb(grid_size, n_actions)

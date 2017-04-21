@@ -45,6 +45,8 @@ def singleProb(i, j, k):
 		return 1
 	if xi == xk and yi - yk == -1 and j == 3:
 		return 1
+	if xi == xk and yi == yk  and j == 4:
+		return 1
 	return 0
 
 def defineProb(grid_size, n_actions):
@@ -60,7 +62,7 @@ def defineProb(grid_size, n_actions):
 
 def getTraj(startfileNum, fileNum, mapId):
 	"""the target map matrix"""
-	f = open("./data/aimap5.txt")
+	f = open("./data/aimap4.txt")
 	line = f.readline()
 	grid_size = int(line[0:line.find(" ")])
 	n_states = grid_size * grid_size

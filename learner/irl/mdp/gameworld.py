@@ -1,29 +1,36 @@
 """
-Implements the gridworld MDP.
+Implements the Gameworld MDP.
 
+Puru Rastogi, 2017
+pururastogi@gmail.com
+
+Derived from the works of
 Matthew Alger, 2015
 matthew.alger@anu.edu.au
 """
 
 import numpy as np
 import numpy.random as rn
+import gamestate 
 
-class Gridworld(object):
+
+class Gameworld():
     """
-    Gridworld MDP.
+    Game world MDP.
     """
 
     def __init__(self, grid_size, wind, discount):
         """
         grid_size: Grid size. int.
         wind: Chance of moving randomly. float.
+        ->discrete : discretization of disttance of elements
         discount: MDP discount. float.
         -> Gridworld
         """
 
-        self.actions = ((1, 0), (0, 1), (-1, 0), (0, -1))
+        self.actions = ((1, 0), (0, 1), (-1, 0), (0, -1),(0,0))
         self.n_actions = len(self.actions)
-        self.n_states = grid_size**2
+        self.n_states =  grid_size**2
         self.grid_size = grid_size
         self.wind = wind
         self.discount = discount
@@ -36,7 +43,7 @@ class Gridworld(object):
              for i in range(self.n_states)])
 
     def __str__(self):
-        return "Gridworld({}, {}, {})".format(self.grid_size, self.wind,
+        return "Gameworld({}, {}, {})".format(self.grid_size, self.wind,
                                               self.discount)
 
     def feature_vector(self, i, feature_map="ident"):
@@ -48,6 +55,9 @@ class Gridworld(object):
             coord, proxi}.
         -> Feature vector.
         """
+        if feature_map == "dless":
+            f = dlessFeature(state,grid_size)
+            return f
 
         if feature_map == "coord":
             f = np.zeros(self.grid_size)
@@ -67,7 +77,45 @@ class Gridworld(object):
         f = np.zeros(self.n_states)
         f[i] = 1
         return f
-     
+
+        def dlessFeature(state, grid_size):
+            """
+            Finding the dimensionless features
+            Feature Vector: 
+            (all distances are manhattan and normaliszed by gridsize)
+            -> distance from the nearest point
+            -> summation of distance from all the points
+            -> distance from the nearest obstacle
+            -> summation of distance from all the obstacles
+            -> distance from the nearest ghost
+            -> summation of distance from all the ghosts
+            """
+            player = state.player
+            f = np.zeros(6)
+
+            dpoint = []                    # distance from each point
+            for (x,y) in state.point:
+                if (x>=0 and  y >=0):
+                    dpoints.append([abs(x- player[0]), abs(y- player[1])])
+
+            dobs = []                      # distance from each obstacle
+            for (x,y) in  state.obs:
+                dobs.append([abs(x- player[0]), abs(y- player[1])])
+            
+            dghost = []                     # distance from each ghost
+            for (x,y) in state.ghost:
+                dghost.append([abs(x- player[0]), abs(y- player[1])])               
+
+            f[0] = min(x+y for x,y in dpoint)/(grid_size*1.0)
+            f[1] = sum(x+y for x,y in dpoint)/(grid_size*1.0)
+            f[2] = min(x+y for x,y in dobs)/(grid_size*1.0)
+            f[3] = sum(x+y for x,y in dobs)/(grid_size*1.0)
+            f[4] = min(x+y for x,y in dghost)/(grid_size*1.0)
+            f[5] = sum(x+y for x,y in dghost)/(grid_size*1.0)                        
+
+            return f
+
+
     def feature_matrix(self, feature_map="ident"):
         """
         Get the feature matrix for this gridworld.
