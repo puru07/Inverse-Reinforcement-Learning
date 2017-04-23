@@ -7,7 +7,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import irl.maxent as maxent
-import irl.mdp.gridworld as gridworld
+import irl.mdp.gameworld as gameworld
+from gamestate import gamestate as gstate 
+from gamestate import arenastate as astate 
 
 def xy2abs(xy):
 	return xy[0] + xy[1] * 7
@@ -60,12 +62,63 @@ def defineProb(grid_size, n_actions):
 	for i in range(n_states)]
 	return res
 
-def getTraj(startfileNum, fileNum, mapId):
+def getTraj(path, name, number):
+
+    filename =  path + name + str(number) + ".txt"
+    print "parsing file: " + filename
+    
+    with open(filename) as file:
+        line = file.readline().strip()
+        wid, hei = line.split(" ")
+        wid = int(wid)
+        hei = int(hei)
+        obs_tup = []
+        line = f.readline().strip()
+        parts = line.split(" ")
+        for i in range(len(parts) / 2):
+            obs_tup.append((int(parts[2 * i]), int(parts[2 * i + 1])))
+        
+        # the states of the game play
+        state_tup = ();
+        while f.readline() != "":
+            f.readline()
+            line = f.readline()
+            parts = line.strip().split(" ")
+            player = (int(parts[1]), int(parts[2]))
+            line = f.readline()
+            parts = line.strip().split(" ")
+            nghost = int(parts[1])
+            ghost_tup = ()*nghost
+            for i in range(nghost):
+                line = f.readline()
+                parts = line.strip().split(" ")
+                ghost_tup[i] = (int(parts[0]), int(parts[1]))
+            line = f.readline()
+            parts = line.strip().split(" ")
+            npoint = int(parts[1])
+            point_tup = ()*npoint
+            for i in range(npoint):
+                line = f.readline()
+                parts = line.strip().split(" ")
+                if int(parts[0]) == 0:
+                    point_tup[i] = (-1, -1)
+                else:
+                    point_tup[i] = (int(parts[1]), int(parts[2]))
+            state_tup = state_tup + (gstate(player,ghost_tup,point_tup))
+            f.readline()
+        f.close()
+        arena_st = astate(nghost, npoint,obs_tup)
+
+		return (arena_st,state_tup)
+
+
+def getTraj_old(startfileNum, fileNum, mapId):
 	"""the target map matrix"""
 	f = open("./data/aimap4.txt")
 	line = f.readline()
 	grid_size = int(line[0:line.find(" ")])
 	n_states = grid_size * grid_size
+	
 	ground_r = []
 
 	line = f.readline()
@@ -80,8 +133,6 @@ def getTraj(startfileNum, fileNum, mapId):
 			else:
 				ground_r.append(0)
 		line = f.readline()
-
-	f.close();
 	gr_array = np.array(ground_r).reshape((grid_size, grid_size))
 
 	"""trajectory matrix stored in the file"""

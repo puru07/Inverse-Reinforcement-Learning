@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import irl.maxent as maxent
-import irl.mdp.gridworld as gridworld
+import irl.mdp.gameworld as gameworld
 
 def print_rmap(rmap):
 	print "rmap is "

@@ -14,7 +14,7 @@ import numpy.random as rn
 import gamestate 
 
 
-class Gameworld():
+class Gameworld(object):
 	"""
 	Game world MDP.
 	"""

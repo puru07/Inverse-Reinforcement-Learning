@@ -89,6 +89,8 @@ def find_feature_expectations(feature_matrix, trajectories):
     -> Feature expectations vector with shape (D,).
     """
 
+######## THIS FUNCTION NEEEDS TO CHANGED FOR NEW KINDS OF FEATURES ######
+
     feature_expectations = np.zeros(feature_matrix.shape[1])
 
     for trajectory in trajectories:
