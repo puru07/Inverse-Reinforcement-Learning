@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 
 import irl.maxent as maxent
 import irl.mdp.gameworld as gameworld
-from gamestate import gamestate as gstate 
-from gamestate import arenastate as astate 
+from irl.mdp.gamestate import gamestate as gstate 
+from irl.mdp.gamestate import arenastate as astate 
 
 def xy2abs(xy):
 	return xy[0] + xy[1] * 100
@@ -111,8 +111,7 @@ def getTraj(path, name, number):
             f.readline()
         f.close()
         arena_st = astate(nghost, npoint,obs_tup)
-
-		return (arena_st,state_tup)
+        return (arena_st,state_tup)
 
 def getMap(address):
 	"""the target map matrix"""

@@ -1,4 +1,4 @@
-class gamestate(onject):
+class gamestate(object):
     """
     State of the game at each point
     """
@@ -10,10 +10,10 @@ class arenastate(object):
 	"""
 	Information about the game arena
 	"""
-    def __init__(self,nghost,npoint,obs_tup):
-    	self.nghost = nghost
-    	self.npoint = npoint
-    	self.obs = obs_tup
+	def __init__(self,nghost,npoint,obs_tup):
+		self.nghost = nghost
+		self.npoint = npoint
+		self.obs = obs_tup
     	
 
 
