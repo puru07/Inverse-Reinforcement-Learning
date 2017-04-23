@@ -12,10 +12,10 @@ from gamestate import gamestate as gstate
 from gamestate import arenastate as astate 
 
 def xy2abs(xy):
-	return xy[0] + xy[1] * 7
+	return xy[0] + xy[1] * 100
 
 def abs2xy(a):
-	return [a % 7, a // 7]
+	return [a % 100, a // 100]
 
 def getAction(cur, next):
 	"""0 -> ; 2 <-; 3 down; 1 up"""
@@ -86,6 +86,7 @@ def getTraj(path, name, number):
             parts = line.strip().split(" ")
             player = (int(parts[1]), int(parts[2]))
             line = f.readline()
+            # Ghosts
             parts = line.strip().split(" ")
             nghost = int(parts[1])
             ghost_tup = ()*nghost
@@ -93,6 +94,8 @@ def getTraj(path, name, number):
                 line = f.readline()
                 parts = line.strip().split(" ")
                 ghost_tup[i] = (int(parts[0]), int(parts[1]))
+            
+            # Points
             line = f.readline()
             parts = line.strip().split(" ")
             npoint = int(parts[1])
@@ -104,77 +107,115 @@ def getTraj(path, name, number):
                     point_tup[i] = (-1, -1)
                 else:
                     point_tup[i] = (int(parts[1]), int(parts[2]))
-            state_tup = state_tup + (gstate(player,ghost_tup,point_tup))
+            state_tup = state_tup + (gstate(player,ghost_tup,point_tup),)
             f.readline()
         f.close()
         arena_st = astate(nghost, npoint,obs_tup)
 
 		return (arena_st,state_tup)
 
-
-def getTraj_old(startfileNum, fileNum, mapId):
+def getMap(address):
 	"""the target map matrix"""
-	f = open("./data/aimap4.txt")
+	f = open(address)
 	line = f.readline()
 	grid_size = int(line[0:line.find(" ")])
 	n_states = grid_size * grid_size
-	
+
 	ground_r = []
 
 	line = f.readline()
+	row = 0
+	col = 0
+	obs = ()
+	point = ()
 	while line:
 		for s in line:
 			if s == '1':
 				ground_r.append(1)
+				obs = obs + ((col,row),)	
+				col = col+1			
 			elif s == 'm':
 				ground_r.append(0.5)
+				point = point + ((col,row),)
+				col = col+1
 			elif s == '\n':
+				col = col+1
 				continue
 			else:
+				col = col+1
 				ground_r.append(0)
+		col = 0
+		row  = row +1
 		line = f.readline()
+	f.close()
+	arena = astate(0,len(point), obs)
 	gr_array = np.array(ground_r).reshape((grid_size, grid_size))
+	return arena
+
+
+def getTraj_old(startfileNum, fileNum, mapId):
+
+	# getting the arena information
+	arena_st = getMap("../data/aimap4.txt")
 
 	"""trajectory matrix stored in the file"""
 	trajectories = []
+	state_tup = ()
 	for fi in range(startfileNum, fileNum + 1):
 		fname = "./data/aidata" + str(fi) + ".txt"
 		f = open(fname)
 		line = f.readline()	# grid_size
 		tralen = 0
-		ppos = []
-		ftraj = []
-		ncoins = 0
+		player = ()
+		# ftraj = []
+		npoint = 0
+		point_pos = ()
 
 		while line:
 			line = f.readline()		# step number
 			line = f.readline()		# position of the player --- line
 			# ----------------
 			print line[3], line[5]
-			ppos.append([int(line[3]), int(line[5])])	# position of player
+			player = player + (( int(line[3]), int(line[5])),)	# position of player
 			tralen = tralen + 1
 			# ----------------
 			line = f.readline()			# number of ghost
 			line = f.readline()			# number of coins ---- line
-			if ncoins == 0:
-				ncoins = int(line[3])			# number of coins
-			for coins in range(ncoins):
+			if npoint == 0:
+				npoint = int(line[3])			# number of coins
+			for point in range(npoint):
 				line = f.readline()
+				parts = line.strip().split(" ")
+				if int(parts[0]) ==0 :
+					point_pos = point_pos + ((-1,-1),)
+				else:
+					point_pos = point_pos + ((parts[1], parts[2]),)
+
 			line = f.readline()
 			line = f.readline()
+			state_tup = state_tup + (gstate(player,(),point_pos),)
+
 		f.close()
-		ppos.append([6,0])
+		for point in range(npoint):
+			line = f.readline()
+			parts = line.strip().split(" ")
+			if int(parts[0]) ==0 :
+				continue
+			else:
+				player  = player + ((parts[1], parts[2]),)
+				break
+
 		print "Trajectory length: " + str(tralen)
 
-		for i in range(0, tralen):
-			ftraj.append([xy2abs(ppos[i]),\
-			getAction(ppos[i], ppos[i+1]), 0])
+		# for i in range(0, tralen):
+		# 	ftraj.append([xy2abs(ppos[i]),\
+		# 	getAction(ppos[i], ppos[i+1]), 0])
 		
-		trajectories.append(ftraj)
+		trajectories.append(state_tup)
 		print "Parsed file: " + fname
 		#print np.array(trajectories)
 
-	return (trajectories, grid_size)
+	return (arena_st, trajectories)
 
 
 def main(fileNum, mapId):
