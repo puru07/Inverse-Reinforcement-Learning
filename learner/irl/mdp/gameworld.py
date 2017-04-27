@@ -11,7 +11,9 @@ matthew.alger@anu.edu.au
 
 import numpy as np
 import numpy.random as rn
-import gamestate 
+from irl.mdp.gamestate import gamestate as gstate 
+from irl.mdp.gamestate import arenastate as astate 
+import commons.parser as parser
 
 
 class Gameworld(object):
@@ -19,7 +21,7 @@ class Gameworld(object):
 	Game world MDP.
 	"""
 
-	def __init__(self, grid_size, wind, discount):
+	def __init__(self, grid_size, discount, arena_st, point_tup):
 		"""
 		grid_size: Grid size. int.
 		wind: Chance of moving randomly. float.
@@ -33,9 +35,10 @@ class Gameworld(object):
 		self.n_actions = len(self.actions)
 		self.n_states =  grid_size**2
 		self.grid_size = grid_size
-		self.wind = wind
+		self.wind = 0.1
 		self.discount = discount
-
+		self.arena = arena_st
+		self.point = point_tup
 		# Preconstruct the transition probability array.
 		self.transition_probability = np.array(
 			[[[self._transition_probability(i, j, k)
@@ -47,7 +50,55 @@ class Gameworld(object):
 		return "Gameworld({}, {}, {})".format(self.grid_size, self.wind,
 											  self.discount)
 
-	def feature_vector(self, i, feature_map="ident"):
+	def dlessFeature(self,state,arena):
+		"""
+		Finding the dimensionless features
+		Feature Vector: 
+		(all distances are manhattan and normaliszed by gridsize)
+		-> distance from the nearest point
+		-> summation of distance from all the points
+		-> distance from the nearest obstacle
+		-> summation of distance from all the obstacles
+		-> distance from the nearest ghost
+		-> summation of distance from all the ghosts
+		"""
+		player = state.player
+		nghost = len(state.ghost)
+		nobs = len(arena.obs)
+		npoint = len(state.point)
+
+		dpoint = []                    # distance from each point
+		for (x,y) in state.point:
+			if (x>=0 and  y >=0):
+				dpoint.append([abs(int(x)- player[0]), abs(int(y)- player[1])])
+			else:
+				dpoint.append([0,0])
+
+		dobs = []                      # distance from each obstacle
+		for (x,y) in  arena.obs:
+			dobs.append([abs(x- player[0]), abs(y- player[1])])
+		
+		dghost = []                     # distance from each ghost
+		if len(state.ghost) != 0:
+			for (x,y) in state.ghost:
+				dghost.append([abs(int(x)- player[0]), abs(int(y)- player[1])])
+			f = np.zeros(6)
+			f[0] = min(x+y for x,y in dpoint)/(self.grid_size*2.0)
+			f[1] = sum(x+y for x,y in dpoint)/(npoint*self.grid_size*2.0)
+			f[2] = min(x+y for x,y in dobs)/(self.grid_size*2.0)
+			f[3] = sum(x+y for x,y in dobs)/(nobs*self.grid_size*2.0)
+			f[4] = min(x+y for x,y in dghost)/(self.grid_size*2.0)
+			f[5] = sum(x+y for x,y in dghost)/(nghost*self.grid_size*2.0)
+		else :
+			f = np.zeros(4)
+			f[0] = min(x+y for x,y in dpoint)/(self.grid_size*2.0)
+			f[1] = sum(x+y for x,y in dpoint)/(npoint*self.grid_size*2.0)
+			f[2] = min(x+y for x,y in dobs)/(self.grid_size*2.0)
+			f[3] = sum(x+y for x,y in dobs)/(nobs*self.grid_size*2.0)
+		print type(f[0])	
+		return f
+
+	def feature_vector(self, i, feature_map,state,arena):
 		"""
 		Get the feature vector associated with a state integer.
 
@@ -57,7 +108,7 @@ class Gameworld(object):
 		-> Feature vector.
 		"""
 		if feature_map == "dless":
-			f = dlessFeature(state,grid_size)
+			f = self.dlessFeature(state,arena)
 			return f
 
 		if feature_map == "coord":
@@ -79,52 +130,9 @@ class Gameworld(object):
 		f[i] = 1
 		return f
 
-		def dlessFeature(state, grid_size):
-			"""
-			Finding the dimensionless features
-			Feature Vector: 
-			(all distances are manhattan and normaliszed by gridsize)
-			-> distance from the nearest point
-			-> summation of distance from all the points
-			-> distance from the nearest obstacle
-			-> summation of distance from all the obstacles
-			-> distance from the nearest ghost
-			-> summation of distance from all the ghosts
-			"""
-			player = state.player
-			
-
-			dpoint = []                    # distance from each point
-			for (x,y) in state.point:
-				if (x>=0 and  y >=0):
-					dpoints.append([abs(x- player[0]), abs(y- player[1])])
-
-			dobs = []                      # distance from each obstacle
-			for (x,y) in  state.obs:
-				dobs.append([abs(x- player[0]), abs(y- player[1])])
-			
-			dghost = []                     # distance from each ghost
-			if len(state.ghost) != 0:
-				for (x,y) in state.ghost:
-					dghost.append([abs(x- player[0]), abs(y- player[1])])
-				f = np.zeros(6)
-				f[0] = min(x+y for x,y in dpoint)/(grid_size*1.0)
-				f[1] = sum(x+y for x,y in dpoint)/(grid_size*1.0)
-				f[2] = min(x+y for x,y in dobs)/(grid_size*1.0)
-				f[3] = sum(x+y for x,y in dobs)/(grid_size*1.0)
-				f[4] = min(x+y for x,y in dghost)/(grid_size*1.0)
-				f[5] = sum(x+y for x,y in dghost)/(grid_size*1.0)
-			else :
-				f = np.zeros(4)   
-				f[0] = min(x+y for x,y in dpoint)/(grid_size*1.0)
-				f[1] = sum(x+y for x,y in dpoint)/(grid_size*1.0)
-				f[2] = min(x+y for x,y in dobs)/(grid_size*1.0)
-				f[3] = sum(x+y for x,y in dobs)/(grid_size*1.0)
-				
-			return f
 
 
-	def feature_matrix(self, feature_map="ident"):
+	def feature_matrix(self, arena,feature_map="ident"):
 		"""
 		Get the feature matrix for this gridworld.
 
@@ -135,7 +143,9 @@ class Gameworld(object):
 
 		features = []
 		for n in range(self.n_states):
-			f = self.feature_vector(n, feature_map)
+			x,y = parser.abs2xy(n,self.grid_size)
+			state = gstate((x,y),(),self.point)
+			f = self.feature_vector(n, feature_map, state,arena)
 			features.append(f)
 		return np.array(features)
 

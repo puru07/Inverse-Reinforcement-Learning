@@ -43,26 +43,27 @@ def getnextstate(astar_out,start):
 #============= THE MAIN SCRIPT STARTS ==============
 traj_len = 0
 try :
-	rmap = np.load('rmap.npy')
+	rmap = np.load('rmap_orig.npy')
 	print "reward map loaded"
 except 	IOError:
 	print "no saved reward map found, training....."
-	traj, grid_size = parser.getTraj(0,15,4)
-	traj_len = len(traj[0])
+	arena_st, gameplay, grid_size = parser.getTraj_old(0,15,4)
+	#grid_size = arena_st.grid_size
+	traj_len = len(gameplay[0])
 	print "got the traj"
-	rmap = trainer.trainer(grid_size,traj,16, traj_len)
+	rmap = trainer.trainer(grid_size,arena_st,gameplay,16, traj_len)
 	np.save('rmap',rmap)
 	print "training done, rmap extracted, astar started"
 
 #display the map
-# rmap2 = np.copy(rmap)
-# rmap2[0][6] = 0
-# rmap2[0][6] = np.amax(rmap2)
-# rmap2 = np.flipud(rmap2)
-# plt.pcolor(rmap2)
-# plt.colorbar()
-# plt.title("Recovered reward")
-# plt.show()
+rmap2 = np.copy(rmap)
+rmap2[0][6] = 0
+rmap2[0][6] = np.amax(rmap2)
+rmap2 = np.flipud(rmap2)
+plt.pcolor(rmap2)
+plt.colorbar()
+plt.title("Recovered reward")
+plt.show()
 
 
 # getting the trrajectory to be tested

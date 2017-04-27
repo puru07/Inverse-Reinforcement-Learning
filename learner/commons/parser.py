@@ -7,15 +7,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import irl.maxent as maxent
-import irl.mdp.gameworld as gameworld
+
 from irl.mdp.gamestate import gamestate as gstate 
 from irl.mdp.gamestate import arenastate as astate 
 
-def xy2abs(xy):
-	return xy[0] + xy[1] * 100
+def xy2abs(xy, grid_size):
+	return xy[0] + xy[1] * grid_size
 
-def abs2xy(a):
-	return [a % 100, a // 100]
+def abs2xy(a, grid_size):
+	return [a % grid_size, a // grid_size]
 
 def getAction(cur, next):
 	"""0 -> ; 2 <-; 3 down; 1 up"""
@@ -31,14 +31,14 @@ def getAction(cur, next):
 		return 4
 	return 0
 
-def singleProb(i, j, k):
+def singleProb(i, j, k, grid_size):
 	"""
 	i: State int.
 	j: Action int.
 	k: State int.
 	"""
-	xi, yi = abs2xy(i)
-	xk, yk = abs2xy(k)
+	xi, yi = abs2xy(i, grid_size)
+	xk, yk = abs2xy(k, grid_size)
 	if xi - xk == 1 and yi == yk and j == 2:
 		return 1
 	if xi == xk and yi - yk == 1 and j == 1:
@@ -56,7 +56,7 @@ def defineProb(grid_size, n_actions):
 
 	"""p(s_k | s_i, a_j)"""
 	
-	res = [[[singleProb(i, j, k) \
+	res = [[[singleProb(i, j, k, grid_size) \
 	for k in range(n_states)] \
 	for j in range(n_actions)] \
 	for i in range(n_states)]
@@ -149,13 +149,12 @@ def getMap(address):
 	f.close()
 	arena = astate(0,len(point), obs)
 	gr_array = np.array(ground_r).reshape((grid_size, grid_size))
-	return arena
-
+	return (arena, grid_size)
 
 def getTraj_old(startfileNum, fileNum, mapId):
 
 	# getting the arena information
-	arena_st = getMap("../data/aimap4.txt")
+	arena_st, grid_size= getMap("./data/aimap4.txt")
 
 	"""trajectory matrix stored in the file"""
 	trajectories = []
@@ -165,7 +164,6 @@ def getTraj_old(startfileNum, fileNum, mapId):
 		f = open(fname)
 		line = f.readline()	# grid_size
 		tralen = 0
-		player = ()
 		# ftraj = []
 		npoint = 0
 		point_pos = ()
@@ -175,35 +173,38 @@ def getTraj_old(startfileNum, fileNum, mapId):
 			line = f.readline()		# position of the player --- line
 			# ----------------
 			print line[3], line[5]
-			player = player + (( int(line[3]), int(line[5])),)	# position of player
+			player = ( int(line[3]), int(line[5]))	# position of player
 			tralen = tralen + 1
 			# ----------------
 			line = f.readline()			# number of ghost
 			line = f.readline()			# number of coins ---- line
 			if npoint == 0:
-				npoint = int(line[3])			# number of coins
+				npoint = int(line[3])
+			point_pos = ()			# number of coins
 			for point in range(npoint):
 				line = f.readline()
 				parts = line.strip().split(" ")
 				if int(parts[0]) ==0 :
 					point_pos = point_pos + ((-1,-1),)
 				else:
-					point_pos = point_pos + ((parts[1], parts[2]),)
+					point_pos = point_pos + ((int(parts[1]), int(parts[2])),)
 
 			line = f.readline()
 			line = f.readline()
 			state_tup = state_tup + (gstate(player,(),point_pos),)
 
 		f.close()
-		for point in range(npoint):
-			line = f.readline()
-			parts = line.strip().split(" ")
-			if int(parts[0]) ==0 :
+		# adding the final position (at the final point) to the trajectory
+		for point in point_pos:
+
+			if point[0] == -1 :
 				continue
 			else:
-				player  = player + ((parts[1], parts[2]),)
+				player  = (point[0], point[1])
+				point = (-1,-1)
 				break
 
+		state_tup = state_tup + (gstate(player,(),point_pos),)
 		print "Trajectory length: " + str(tralen)
 
 		# for i in range(0, tralen):
@@ -214,7 +215,22 @@ def getTraj_old(startfileNum, fileNum, mapId):
 		print "Parsed file: " + fname
 		#print np.array(trajectories)
 
-	return (arena_st, trajectories)
+	return (arena_st, trajectories, grid_size)
+
+def getTrajfromGameplay(state_tup, grid_size):
+	trajectories = []
+	trace = []
+	for trial_num in range(0,len(state_tup)):
+		trace[:] = []
+		for state_num in range(0,len(state_tup[trial_num])-1):
+			trace.append([xy2abs(state_tup[trial_num][state_num].player, grid_size),\
+			getAction(state_tup[trial_num][state_num].player, state_tup[trial_num][state_num+1].player),0])
+		state_num = len(state_tup[trial_num])-1
+		trace.append([xy2abs(state_tup[trial_num][state_num].player, grid_size),4,0])
+		trajectories.append(trace)
+
+	return trajectories		
+
 
 
 def main(fileNum, mapId):
