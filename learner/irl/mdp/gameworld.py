@@ -21,7 +21,7 @@ class Gameworld(object):
 	Game world MDP.
 	"""
 
-	def __init__(self, grid_size, discount, arena_st):
+	def __init__(self, grid_size, arena_st, discount=0.1):
 		"""
 		grid_size: Grid size. int.
 		wind: Chance of moving randomly. float.
@@ -38,7 +38,8 @@ class Gameworld(object):
 		self.wind = 0.1
 		self.discount = discount
 		self.arena = arena_st
-		
+		self.point = arena_st.point
+
 		# Preconstruct the transition probability array.
 		self.transition_probability = np.array(
 			[[[self._transition_probability(i, j, k)

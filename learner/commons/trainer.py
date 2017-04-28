@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 Developer: Puru Rastogi
 Test the accuracy of path prediction
@@ -11,7 +12,7 @@ import irl.maxent as maxent
 import irl.mdp.gameworld as gameworld
 from irl.mdp.gamestate import gamestate as gstate 
 from irl.mdp.gamestate import arenastate as astate 
-import parser 
+import commons.parser as parser
 
 
 
@@ -25,10 +26,12 @@ def trainer(grid_size,arena_st,gameplay, ndata, traj_len):
 
 	"""transition probability"""
 	transition_probability = parser.defineProb(grid_size, n_actions)
-	gw = gameworld.Gameworld(grid_size, discount, arena_st, gameplay[0][0].point)
+	gw = gameworld.Gameworld(grid_size, arena_st,discount)
+
 	"""feature matrix dless type"""
 	feature_matrix = gw.feature_matrix(arena_st,"dless")
 	trajectories = parser.getTrajfromGameplay(gameplay, grid_size)
+
 	# feature_matrix = []
 	# for i in range(0, grid_size * grid_size):
 	# 	fmtemp = []
