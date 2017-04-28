@@ -21,7 +21,7 @@ class Gameworld(object):
 	Game world MDP.
 	"""
 
-	def __init__(self, grid_size, discount, arena_st, point_tup):
+	def __init__(self, grid_size, discount, arena_st):
 		"""
 		grid_size: Grid size. int.
 		wind: Chance of moving randomly. float.
@@ -38,7 +38,7 @@ class Gameworld(object):
 		self.wind = 0.1
 		self.discount = discount
 		self.arena = arena_st
-		self.point = point_tup
+		
 		# Preconstruct the transition probability array.
 		self.transition_probability = np.array(
 			[[[self._transition_probability(i, j, k)
@@ -95,7 +95,7 @@ class Gameworld(object):
 			f[1] = sum(x+y for x,y in dpoint)/(npoint*self.grid_size*2.0)
 			f[2] = min(x+y for x,y in dobs)/(self.grid_size*2.0)
 			f[3] = sum(x+y for x,y in dobs)/(nobs*self.grid_size*2.0)
-		print type(f[0])	
+		# print type(f[0])	
 		return f
 
 	def feature_vector(self, i, feature_map,state,arena):
@@ -144,7 +144,7 @@ class Gameworld(object):
 		features = []
 		for n in range(self.n_states):
 			x,y = parser.abs2xy(n,self.grid_size)
-			state = gstate((x,y),(),self.point)
+			state = gstate((x,y),(),self.arena.point)
 			f = self.feature_vector(n, feature_map, state,arena)
 			features.append(f)
 		return np.array(features)

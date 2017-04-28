@@ -1,5 +1,5 @@
 """
-Developer: Zewen Wang
+Developer: Zewen Wang & Puru Rastogi
 Train the aimlplatform data set using irl
 Date: 3/24/2017
 """
@@ -86,6 +86,7 @@ def getTraj(path, name, number):
             parts = line.strip().split(" ")
             player = (int(parts[1]), int(parts[2]))
             line = f.readline()
+
             # Ghosts
             parts = line.strip().split(" ")
             nghost = int(parts[1])
@@ -110,7 +111,7 @@ def getTraj(path, name, number):
             state_tup = state_tup + (gstate(player,ghost_tup,point_tup),)
             f.readline()
         f.close()
-        arena_st = astate(nghost, npoint,obs_tup)
+        arena_st = astate(nghost, point_tup,obs_tup)
         return (arena_st,state_tup)
 
 def getMap(address):
@@ -147,14 +148,14 @@ def getMap(address):
 		row  = row +1
 		line = f.readline()
 	f.close()
-	arena = astate(0,len(point), obs)
-	gr_array = np.array(ground_r).reshape((grid_size, grid_size))
+	arena = astate(0,point, obs)
+	# gr_array = np.array(ground_r).reshape((grid_size, grid_size))
 	return (arena, grid_size)
 
 def getTraj_old(startfileNum, fileNum, mapId):
 
 	# getting the arena information
-	arena_st, grid_size= getMap("./data/aimap4.txt")
+	arena_st, grid_size= getMap("./data/aimap5.txt")
 
 	"""trajectory matrix stored in the file"""
 	trajectories = []

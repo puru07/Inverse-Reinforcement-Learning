@@ -53,7 +53,7 @@ def irl(feature_matrix, n_actions, discount, transition_probability,
 
         alpha += learning_rate * grad
         print "epoch number ", i
-    return feature_matrix.dot(alpha).reshape((n_states,))
+    return (feature_matrix.dot(alpha).reshape((n_states,)),alpha)
 
 def find_svf(n_states, trajectories):
     """

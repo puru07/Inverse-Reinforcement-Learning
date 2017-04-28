@@ -43,11 +43,13 @@ def trainer(grid_size,arena_st,gameplay, ndata, traj_len):
 
 	"""obtain the learning result"""
 
-	print len(trajectories), len(trajectories[0]), len(trajectories[0][0]), np.array(trajectories).shape
-	r = maxent.irl(feature_matrix, n_actions, discount, \
+	print "number of traj", len(trajectories[0]), \
+	"\n total number of stares",len(trajectories[0][0]), \
+	"\n shape of traj data structure ",np.array(trajectories).shape
+	r,alpha = maxent.irl(feature_matrix, n_actions, discount, \
 	np.array(transition_probability), np.array(trajectories), epochs, learning_rate)
 
-	return r.reshape((grid_size, grid_size))
+	return (r.reshape((grid_size, grid_size)), alpha)
 
 	
 

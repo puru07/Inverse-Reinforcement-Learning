@@ -13,8 +13,8 @@ class arenastate(object):
 	"""
 	Information about the game arena
 	"""
-	def __init__(self,nghost,npoint,obs_tup):
+	def __init__(self,nghost,point_tup,obs_tup):
 		self.nghost = nghost
-		self.npoint = npoint
+		self.point = point_tup
 		self.obs = obs_tup
     	
