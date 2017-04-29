@@ -62,57 +62,58 @@ def defineProb(grid_size, n_actions):
 	for i in range(n_states)]
 	return res
 
-def getTraj(path, name, number):
+def getTraj(startfileNum, fileNum):
+	
+	trajectories = []		# set of trajectories to be returned
+	# iterating through the files
+	for fi in range(startfileNum, fileNum + 1):
+		filename = "./data/aidata" + str(fi) + ".txt"
+		with open(filename) as file:
+			line = file.readline().strip()
+			grid_size, hei = line.split(" ")
+			grid_size = int(grid_size)
+			hei = int(hei)
+			obs_tup = []
+			line = file.readline().strip()
+			parts = line.split(" ")
+			for i in range(len(parts) / 2):
+				obs_tup.append((int(parts[2 * i]), int(parts[2 * i + 1])))
+			state_tup = ();
+			while file.readline() != "":
+				file.readline()
+				line = file.readline()
+				parts = line.strip().split(" ")
+				player = (int(parts[1]), int(parts[2]))
+				line = file.readline()
 
-    filename =  path + name + str(number) + ".txt"
-    print "parsing file: " + filename
-    
-    with open(filename) as file:
-        line = file.readline().strip()
-        wid, hei = line.split(" ")
-        wid = int(wid)
-        hei = int(hei)
-        obs_tup = []
-        line = f.readline().strip()
-        parts = line.split(" ")
-        for i in range(len(parts) / 2):
-            obs_tup.append((int(parts[2 * i]), int(parts[2 * i + 1])))
-        
-        # the states of the game play
-        state_tup = ();
-        while f.readline() != "":
-            f.readline()
-            line = f.readline()
-            parts = line.strip().split(" ")
-            player = (int(parts[1]), int(parts[2]))
-            line = f.readline()
-
-            # Ghosts
-            parts = line.strip().split(" ")
-            nghost = int(parts[1])
-            ghost_tup = ()*nghost
-            for i in range(nghost):
-                line = f.readline()
-                parts = line.strip().split(" ")
-                ghost_tup[i] = (int(parts[0]), int(parts[1]))
-            
-            # Points
-            line = f.readline()
-            parts = line.strip().split(" ")
-            npoint = int(parts[1])
-            point_tup = ()*npoint
-            for i in range(npoint):
-                line = f.readline()
-                parts = line.strip().split(" ")
-                if int(parts[0]) == 0:
-                    point_tup[i] = (-1, -1)
-                else:
-                    point_tup[i] = (int(parts[1]), int(parts[2]))
-            state_tup = state_tup + (gstate(player,ghost_tup,point_tup),)
-            f.readline()
-        f.close()
-        arena_st = astate(nghost, point_tup,obs_tup)
-        return (arena_st,state_tup)
+				# Ghosts
+				parts = line.strip().split(" ")
+				nghost = int(parts[1])
+				ghost_tup = ()
+				for i in range(nghost):
+					line = file.readline()
+					parts = line.strip().split(" ")
+					ghost_tup = ghost_tup + ((int(parts[0]), int(parts[1])),)
+	            
+	            # Points
+				line = file.readline()
+				parts = line.strip().split(" ")
+				npoint = int(parts[1])
+				point_tup = ()
+				for i in range(npoint):
+					line = file.readline()
+					parts = line.strip().split(" ")
+					if int(parts[0]) == 0:
+						point_tup = point_tup + ((-1, -1),)
+					else:
+						point_tup = point_tup + ((int(parts[1]), int(parts[2])),)
+				state_tup = state_tup + (gstate(player,ghost_tup,point_tup),)
+				file.readline()
+		file.close()
+		arena_st = astate(nghost, point_tup,obs_tup)
+		trajectories.append([arena_st,state_tup])
+		del arena_st
+	return (trajectories,grid_size)			# set-of-trajectories , grid_size
 
 def getMap(address):
 	"""the target map matrix"""
@@ -218,7 +219,7 @@ def getTraj_old(startfileNum, fileNum, mapId):
 
 	return (arena_st, trajectories, grid_size)
 
-def getTrajfromGameplay(state_tup, grid_size):
+def getTrajfromGameplay_old(state_tup, grid_size):
 	trajectories = []
 	trace = []
 	for trial_num in range(0,len(state_tup)):
@@ -230,7 +231,20 @@ def getTrajfromGameplay(state_tup, grid_size):
 		trace.append([xy2abs(state_tup[trial_num][state_num].player, grid_size),4,0])
 		trajectories.append(trace)
 
-	return trajectories		
+	return trajectories
+def	getTrajfromGameplay(trajset, grid_size):
+	trajectories = []
+	trace = []
+	for trial_num in range(0,len(trajset)):
+		trace[:] = []
+		for state_num in range(0,len(trajset[trial_num][1])-1):
+			trace.append([xy2abs(trajset[trial_num][1][state_num].player, grid_size),\
+			getAction(trajset[trial_num][1][state_num].player, trajset[trial_num][1][state_num+1].player),0])
+		state_num = len(trajset[trial_num][1])-1
+		trace.append([xy2abs(trajset[trial_num][1][state_num].player, grid_size),4,0])
+		trajectories.append(trace)	
+	return trajectories
+
 
 
 

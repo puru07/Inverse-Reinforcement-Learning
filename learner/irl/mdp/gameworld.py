@@ -131,8 +131,6 @@ class Gameworld(object):
 		f[i] = 1
 		return f
 
-
-
 	def feature_matrix(self, arena,feature_map="ident"):
 		"""
 		Get the feature matrix for this gridworld.

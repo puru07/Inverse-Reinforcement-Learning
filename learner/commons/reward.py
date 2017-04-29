@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from irl.mdp.gamestate import gamestate as gstate 
 from irl.mdp.gamestate import arenastate as astate 
 import irl.mdp.gameworld as gameworld

@@ -47,11 +47,11 @@ try :
 	print "reward map loaded"
 except 	IOError:
 	print "no saved reward map found, training....."
-	arena_st, gameplay, grid_size = parser.getTraj_old(0,20,5)
+	gameplay, grid_size = parser.getTraj(0,2)
 	#grid_size = arena_st.grid_size
 	traj_len = len(gameplay[0])
 	print "got the traj"
-	rmap, alpha = trainer.trainer(grid_size,arena_st,gameplay,16, traj_len)
+	rmap, alpha = trainer.trainer(grid_size,gameplay,16, traj_len)
 	np.save('rmap',rmap)
 	np.save('weights',alpha)
 	print "training done, rmap extracted, astar started"
