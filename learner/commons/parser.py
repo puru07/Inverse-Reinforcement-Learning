@@ -234,7 +234,7 @@ def getTrajfromGameplay_old(state_tup, grid_size):
 	return trajectories
 def	getTrajfromGameplay(trajset, grid_size):
 	trajectories = []
-	trace = []
+	trace = []	
 	for trial_num in range(0,len(trajset)):
 		trace[:] = []
 		for state_num in range(0,len(trajset[trial_num][1])-1):
@@ -244,9 +244,6 @@ def	getTrajfromGameplay(trajset, grid_size):
 		trace.append([xy2abs(trajset[trial_num][1][state_num].player, grid_size),4,0])
 		trajectories.append(trace)	
 	return trajectories
-
-
-
 
 def main(fileNum, mapId):
 	# learning parameters 
