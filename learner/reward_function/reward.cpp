@@ -20,7 +20,7 @@ rewardmap::rewardmap(std::string& address, int& Grid , std::vector<point>& Obs,s
 
 }
 
-double rewardmap::getCost(point player)
+double rewardmap::getReward(point player)
 {
 	// get the reward of the input point 'player'
 	std::vector<double> f_val(4,0);

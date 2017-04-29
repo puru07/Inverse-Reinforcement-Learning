@@ -29,6 +29,6 @@ private:
 public:
 	rewardmap(std::string& address, int& Grid , std::vector<point>& Obs,std::vector<point>& Coin);
 	~rewardmap(){};
-	double getCost(point player);
+	double getReward(point player);
 
 };
