@@ -42,7 +42,7 @@ def getnextstate(astar_out, start):
 
 
 ###############################################################
-#  THE MAIN SCRIPT STARTS  
+#  THE MAIN SCRIPT STARTS
 traj_len = 0
 try:
     rmap = np.load('rmap.npy')
@@ -53,21 +53,27 @@ except IOError:
     #grid_size = arena_st.grid_size
     traj_len = len(gameplay[0])
     print "got the traj"
-    rmap, alpha = trainer.trainer(grid_size, gameplay, 16, traj_len)
+    rmap, alpha = trainer.trainer(grid_size, gameplay, 30, traj_len)
+    print "the weights are "
+    print alpha
     np.save('rmap', rmap)
     np.save('weights', alpha)
     print "training done, rmap extracted, astar started"
+    # display the map
+    point_tup = gameplay[0][0].point
+    print "the points are at ", point_tup
+    rmap2 = np.copy(rmap)
+    for point in point_tup:
+        rmap2[point[1]][point[0]] = 0
+        rmap2[point[1]][point[0]] = np.amax(rmap2)
+    rmap2 = np.flipud(rmap2)
 
-# display the map
-# rmap2 = np.copy(rmap)
-# rmap2[0][6] = 0
-# rmap2[0][6] = np.amax(rmap2)
-# rmap2 = np.flipud(rmap2)
-# plt.pcolor(rmap2)
-# plt.colorbar()
-# plt.title("Recovered reward")
-# plt.show()
-
+    # plotting
+    plt.pcolor(rmap2)
+    plt.colorbar()
+    plt.title("Recovered reward")
+    plt.show()
+    print "map is plotted!!"
 
 # getting the trrajectory to be tested
 # tstart = 16
