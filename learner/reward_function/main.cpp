@@ -7,7 +7,7 @@ int main()
 	obs.push_back(point(1,2));
 	coin.push_back(point(5,5));
 	point player(3,5);
-	std::string addr("let party play");
+	std::string addr("../weights.txt");
 	int grid_size = 7;
 	rewardmap rmap(addr,grid_size,obs,coin);
 	double cost = rmap.getReward(player);

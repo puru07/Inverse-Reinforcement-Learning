@@ -1,5 +1,7 @@
 #include "reward.hpp"
 
+using namespace std;
+
 point operator-(point& a, point& b)
 {
 	// overloading the subraction operator for two points
@@ -17,6 +19,7 @@ rewardmap::rewardmap(std::string& address, int& Grid , std::vector<point>& Obs,s
 	alpha.push_back(-174.0);
 	alpha.push_back(300);
 	alpha.push_back(400);
+	
 
 }
 

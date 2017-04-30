@@ -6,23 +6,18 @@ Date: 3/26/2017
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
-
 import irl.maxent as maxent
 import irl.mdp.gameworld as gameworld
-from irl.mdp.gamestate import gamestate as gstate 
-from irl.mdp.gamestate import arenastate as astate 
+
 import commons.parser as parser
 
 
 
-def trainer(grid_size,gameplay, ndata, traj_len):
-	trajectory_length = traj_len   		#length of one traj
-	discount = 0.1        				#discount past
-	n_trajectories = ndata 		    	#number of traj
-	epochs = 50          				#iteration times
-	learning_rate = 0.1    				#learning rate
-	n_actions = 5;         				#number of actions
+def trainer(grid_size,gameplay, ndata):
+	discount = 0.1        				# discount past
+	epochs = 50                    # iteration times
+	learning_rate = 0.1            # learning rate
+	n_actions = 5                  # number of actions
 
 	# transition probability
 	transition_probability = parser.defineProb(grid_size, n_actions)
@@ -32,7 +27,7 @@ def trainer(grid_size,gameplay, ndata, traj_len):
 	gw = gameworld.Gameworld(grid_size, arena_st,discount)
 
 	# feature matrix dless type
-	feature_matrix = gw.feature_matrix(arena_st,"dless")
+	feature_matrix = gw.feature_matrix(arena_st,"dless","velnoghost")
 	trajectories = parser.getTrajfromGameplay(gameplay, grid_size)
 
 	# feature_matrix = []

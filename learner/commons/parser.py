@@ -113,7 +113,11 @@ def getTraj(startfileNum, fileNum):
                     else:
                         point_tup = point_tup + \
                             ((int(parts[1]), int(parts[2])),)
-                state_tup = state_tup + (gstate(player, ghost_tup, point_tup),)
+                if len(state_tup) ==0:
+                    state_tup = state_tup + (gstate(player, ghost_tup, point_tup),)
+                else:
+                    state_tup = state_tup + (gstate(player, ghost_tup, point_tup,\
+                        getAction(state_tup[-1].player,player),state_tup[-1].Vel),)
                 file.readline()
         file.close()
         arena_st = astate(nghost, point_tup, obs_tup)

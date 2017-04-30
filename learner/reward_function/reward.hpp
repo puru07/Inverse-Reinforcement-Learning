@@ -1,9 +1,11 @@
 #include <iostream>
 #include <string.h>
+#include <string>
 #include <fstream>
 #include <math.h>
 #include <vector>
 #include <limits.h>
+#include <stdio.h>
 
 class point
 {
@@ -15,8 +17,8 @@ public:
 	~point(){};
 	int getMdistance(point P) {
 		// returns the manhataan distance between two points
-	return fabs(x - P.x) + fabs(y - P.y);
-} 
+		return fabs((double)x - P.x) + fabs((double)y - P.y);
+	} 
 
 };
 class rewardmap

@@ -53,7 +53,7 @@ except IOError:
     #grid_size = arena_st.grid_size
     traj_len = len(gameplay[0])
     print "got the traj"
-    rmap, alpha = trainer.trainer(grid_size, gameplay, 16, traj_len)
+    rmap, alpha = trainer.trainer(grid_size, gameplay, 30)
     np.save('rmap', rmap)
     np.save('weights', alpha)
     print "training done, rmap extracted, astar started"
