@@ -49,7 +49,7 @@ try:
     print "reward map loaded"
 except IOError:
     print "no saved reward map found, training....."
-    gameplay, grid_size = parser.getTraj(0, 2)
+    gameplay, grid_size = parser.getTraj(0, 30)
     #grid_size = arena_st.grid_size
     traj_len = len(gameplay[0])
     print "got the traj"
