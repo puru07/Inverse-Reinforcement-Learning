@@ -3,10 +3,6 @@ Developer: Zewen Wang & Puru Rastogi
 Train the aimlplatform data set using irl
 Date: 3/24/2017
 """
-import numpy as np
-import matplotlib.pyplot as plt
-
-import irl.maxent as maxent
 
 from irl.mdp.gamestate import gamestate as gstate
 from irl.mdp.gamestate import arenastate as astate
@@ -131,10 +127,7 @@ def getMap(address):
     f = open(address)
     line = f.readline()
     grid_size = int(line[0:line.find(" ")])
-    n_states = grid_size * grid_size
-
     ground_r = []
-
     line = f.readline()
     row = 0
     col = 0
@@ -261,49 +254,3 @@ def getTrajfromGameplay(trajset, grid_size):
             [xy2abs(trajset[trial_num][1][state_num].player, grid_size), 4, 0])
         trajectories.append(trace)
     return trajectories
-
-
-def main(fileNum, mapId):
-    # learning parameters
-    trajectory_length = 10  	# length of one traj
-    discount = 0.1  # discount past
-    n_trajectories = 21  # number of traj
-    epochs = 200  # iteration times
-    learning_rate = 0.1  # learning rate
-    n_actions = 4  # number of actions
-    trajectories = getTraj()
-
-    """transition probability"""
-    transition_probability = defineProb(grid_size, n_actions)
-
-    """feature matrix ident type"""
-    feature_matrix = []
-    for i in range(0, grid_size * grid_size):
-        fmtemp = []
-        for j in range(0, grid_size * grid_size):
-            if j == i:
-                fmtemp.append(1)
-            else:
-                fmtemp.append(0)
-        feature_matrix.append(fmtemp)
-    # print np.array(feature_matrix)
-
-    """obtain the learning result"""
-    r = maxent.irl(np.array(feature_matrix), n_actions, discount,
-                   np.array(transition_probability), np.array(trajectories), epochs, learning_rate)
-
-    # """plot the result"""
-    plt.subplot(1, 2, 1)
-    plt.pcolor(gr_array)
-    plt.colorbar()
-    plt.title("origin map")
-
-    plt.subplot(1, 2, 2)
-    plt.pcolor(r.reshape((grid_size, grid_size)))
-    plt.colorbar()
-    plt.title("learned reward")
-
-    plt.show()
-
-if __name__ == '__main__':
-    main(20, 4)
