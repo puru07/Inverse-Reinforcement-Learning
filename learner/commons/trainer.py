@@ -19,15 +19,16 @@ def trainer(grid_size,gameplay, ndata):
 	learning_rate = 0.1            # learning rate
 	n_actions = 5                  # number of actions
 
+    mode = "velnoghost"
 	# transition probability
-	transition_probability = parser.defineProb(grid_size, n_actions)
+	transition_probability = parser.defineProb(grid_size, n_actions,mode)
 
 	# definig the game world
 	arena_st = gameplay[0][0]
 	gw = gameworld.Gameworld(grid_size, arena_st,discount)
 
 	# feature matrix dless type
-	feature_matrix = gw.feature_matrix(arena_st,"dless","velnoghost")
+	feature_matrix = gw.feature_matrix(arena_st,"dless",mode)
 	trajectories = parser.getTrajfromGameplay(gameplay, grid_size)
 
 	# feature_matrix = []

@@ -52,7 +52,7 @@ def singleProb(i, j, k, grid_size):
     return 0
 
 
-def defineProb(grid_size, n_actions):
+def defineProb(grid_size, n_actions,mode):
     n_states = grid_size * grid_size
 
     """p(s_k | s_i, a_j)"""
@@ -66,7 +66,7 @@ def defineProb(grid_size, n_actions):
 
 def getTraj(startfileNum, fileNum):
 
-    trajectories = []		# set of trajectories to be returned
+    trajectories = []       # set of trajectories to be returned
     # iterating through the files
     for fi in range(startfileNum, fileNum + 1):
         filename = "./data/aidata" + str(fi) + ".txt"
@@ -84,6 +84,7 @@ def getTraj(startfileNum, fileNum):
             for i in range(len(parts) / 2):
                 obs_tup.append((int(parts[2 * i]), int(parts[2 * i + 1])))
             state_tup = ()
+            arena_point = ()
             while file.readline() != "":
                 file.readline()
                 line = file.readline()
@@ -113,17 +114,15 @@ def getTraj(startfileNum, fileNum):
                     else:
                         point_tup = point_tup + \
                             ((int(parts[1]), int(parts[2])),)
-                if len(state_tup) ==0:
-                    state_tup = state_tup + (gstate(player, ghost_tup, point_tup),)
-                else:
-                    state_tup = state_tup + (gstate(player, ghost_tup, point_tup,\
-                        getAction(state_tup[-1].player,player),state_tup[-1].Vel),)
+                if len(arena_point) ==0:
+                    arena_point = point_tup
+                state_tup = state_tup + (gstate(player, ghost_tup, point_tup),)
                 file.readline()
         file.close()
-        arena_st = astate(nghost, point_tup, obs_tup)
+        arena_st = astate(nghost, arena_point, obs_tup)
         trajectories.append([arena_st, state_tup])
         del arena_st
-    return (trajectories, grid_size)			# set-of-trajectories , grid_size
+    return (trajectories, grid_size)            # set-of-trajectories , grid_size
 
 
 def getMap(address):
