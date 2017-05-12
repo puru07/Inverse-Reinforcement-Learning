@@ -1,18 +1,15 @@
 """
 Implements the Gameworld MDP.
-
-Puru Rastogi, 2017
-pururastogi@gmail.com
-
-Derived from the works of
-Matthew Alger, 2015
-matthew.alger@anu.edu.au
 """
+__author__ = "Puru Rastogi"
+__email__ = "pururastogi@gmail.com"
+__credits__ = " based on the work of Matthew Alger, matthew.alger@anu.edu.au "
+
 
 import numpy as np
 import numpy.random as rn
 from irl.mdp.gamestate import gamestate as gstate
-from irl.mdp.gamestate import arenastate as astate
+# from irl.mdp.gamestate import arenastate as astate
 import commons.parser as parser
 
 
@@ -67,7 +64,7 @@ class Gameworld(object):
         nghost = len(state.ghost)
         nobs = len(arena.obs)
         npoint = len(state.point)
-        print "the points are ", state.point
+        # print "the points are ", state.point
         dpoint = []                    # distance from each point
         for (x, y) in state.point:
             if (x >= 0 and y >= 0):

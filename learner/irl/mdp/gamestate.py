@@ -1,3 +1,10 @@
+""" Classes of state and map
+"""
+
+__author__ = "Puru Rastogi"
+__email__ = "pururastogi@gmail.com"
+
+
 class gamestate(object):
     """
     State of the game at each point

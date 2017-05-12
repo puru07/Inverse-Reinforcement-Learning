@@ -1,8 +1,10 @@
-"""
-Developer: Zewen Wang & Puru Rastogi
+#!/usr/bin/env python
+'''
 Train the aimlplatform data set using irl
-Date: 3/24/2017
-"""
+'''
+__author__ = "Zewen Wang & Puru Rastogi"
+__email__ = "pururastogi@gmail.com"
+
 
 from irl.mdp.gamestate import gamestate as gstate
 from irl.mdp.gamestate import arenastate as astate
@@ -64,65 +66,60 @@ def defineProb(grid_size, n_actions):
     return res
 
 
-def getTraj(startfileNum, fileNum):
+def getMap2(address):
+    ''' returns map from the new data files
+        return arena_st , grid_size'''
+    with open(address) as file:
+        line = file.readline().strip()
+        grid_size, hei = line.split(" ")
+        grid_size = int(grid_size)
+        hei = int(hei)
+        obs_tup = []
+        line = file.readline().strip()
+        line = line.replace(r')(', r',')
+        line = line.replace(r'(', '')
+        line = line.replace(r')', '')
+        parts = line.split(',')
+        for i in range(len(parts) / 2):
+            obs_tup.append((int(parts[2 * i]), int(parts[2 * i + 1])))
+        arena_point = ()
 
-    trajectories = []		# set of trajectories to be returned
-    # iterating through the files
-    for fi in range(startfileNum, fileNum + 1):
-        filename = "./data/aidata" + str(fi) + ".txt"
-        with open(filename) as file:
-            line = file.readline().strip()
-            grid_size, hei = line.split(" ")
-            grid_size = int(grid_size)
-            hei = int(hei)
-            obs_tup = []
-            line = file.readline().strip()
-            line = line.replace(r')(', r',')
-            line = line.replace(r'(', '')
-            line = line.replace(r')', '')
-            parts = line.split(',')
-            for i in range(len(parts) / 2):
-                obs_tup.append((int(parts[2 * i]), int(parts[2 * i + 1])))
-            state_tup = ()
-            arena_point = ()
-            while file.readline() != "":
-                file.readline()
-                line = file.readline()
-                parts = line.strip().split(" ")
-                player = (int(parts[1]), int(parts[2]))
-                line = file.readline()
+        # starting to read the main data
+        file.readline()
+        line = file.readline()
+        line = file.readline()
+        parts = line.strip().split(" ")
+        # player = (int(parts[1]), int(parts[2]))
+        line = file.readline()
 
-                # Ghosts
-                parts = line.strip().split(" ")
-                nghost = int(parts[1])
-                ghost_tup = ()
-                for i in range(nghost):
-                    line = file.readline()
-                    parts = line.strip().split(" ")
-                    ghost_tup = ghost_tup + ((int(parts[0]), int(parts[1])),)
+        # Ghosts
+        parts = line.strip().split(" ")
+        nghost = int(parts[1])
+        ghost_tup = ()
+        for i in range(nghost):
+            line = file.readline()
+            parts = line.strip().split(" ")
+            ghost_tup = ghost_tup + ((int(parts[0]), int(parts[1])),)
 
-# Points
-                line = file.readline()
-                parts = line.strip().split(" ")
-                npoint = int(parts[1])
-                point_tup = ()
-                for i in range(npoint):
-                    line = file.readline()
-                    parts = line.strip().split(" ")
-                    if int(parts[0]) == 0:
-                        point_tup = point_tup + ((-1, -1),)
-                    else:
-                        point_tup = point_tup + \
-                            ((int(parts[1]), int(parts[2])),)
-                if len(arena_point) ==0:
-                    arena_point = point_tup
-                state_tup = state_tup + (gstate(player, ghost_tup, point_tup),)
-                file.readline()
-        file.close()
-        arena_st = astate(nghost, arena_point, obs_tup)
-        trajectories.append([arena_st, state_tup])
-        del arena_st
-    return (trajectories, grid_size)			# set-of-trajectories , grid_size
+        # Points
+        line = file.readline()
+        parts = line.strip().split(" ")
+        npoint = int(parts[1])
+        point_tup = ()
+        for i in range(npoint):
+            line = file.readline()
+            parts = line.strip().split(" ")
+            if int(parts[0]) == 0:
+                point_tup = point_tup + ((-1, -1),)
+            else:
+                point_tup = point_tup + \
+                    ((int(parts[1]), int(parts[2])),)
+        arena_point = point_tup
+        file.readline()
+    file.close()
+    arena_st = astate(nghost, arena_point, obs_tup)
+
+    return (arena_st, grid_size)
 
 
 def getMap(address):
@@ -161,7 +158,111 @@ def getMap(address):
     return (arena, grid_size)
 
 
-def getTraj_old(startfileNum, fileNum, mapId):
+def getTraj(startfileNum, fileNum, folder):
+    ''' > sarting file # 2> ending file # 
+    3> address + common string in filenames '''
+
+    trajectories = []       # set of trajectories to be returned
+    # iterating through the files
+    for fi in range(startfileNum, fileNum + 1):
+        filename = folder + str(fi) + ".txt"
+        with open(filename) as file:
+            line = file.readline().strip()
+            grid_size, hei = line.split(" ")
+            grid_size = int(grid_size)
+            hei = int(hei)
+            obs_tup = []
+            line = file.readline().strip()
+            line = line.replace(r')(', r',')
+            line = line.replace(r'(', '')
+            line = line.replace(r')', '')
+            parts = line.split(',')
+            for i in range(len(parts) / 2):
+                obs_tup.append((int(parts[2 * i]), int(parts[2 * i + 1])))
+            state_tup = ()
+            arena_point = ()
+            while file.readline() != "":
+                file.readline()
+                line = file.readline()
+                parts = line.strip().split(" ")
+                player = (int(parts[1]), int(parts[2]))
+                line = file.readline()
+
+                # Ghosts
+                parts = line.strip().split(" ")
+                nghost = int(parts[1])
+                ghost_tup = ()
+                for i in range(nghost):
+                    line = file.readline()
+                    parts = line.strip().split(" ")
+                    ghost_tup = ghost_tup + ((int(parts[0]), int(parts[1])),)
+
+                # Points
+                line = file.readline()
+                parts = line.strip().split(" ")
+                npoint = int(parts[1])
+                point_tup = ()
+                for i in range(npoint):
+                    line = file.readline()
+                    parts = line.strip().split(" ")
+                    if int(parts[0]) == 0:
+                        point_tup = point_tup + ((-1, -1),)
+                    else:
+                        point_tup = point_tup + \
+                            ((int(parts[1]), int(parts[2])),)
+                if len(arena_point) == 0:
+                    arena_point = point_tup
+                state_tup = state_tup + (gstate(player, ghost_tup, point_tup),)
+                file.readline()
+        file.close()
+        arena_st = astate(nghost, arena_point, obs_tup)
+        trajectories.append([arena_st, state_tup])
+        del arena_st
+    return (trajectories, grid_size)          # set-of-trajectories , grid_size
+
+
+def getOneTraj(filename):
+    ''' get individual trjectory using new data file'''
+    arena_st, grid_size = getMap2(filename)
+    state_tup = ()                              # for storing eah state
+    npoint = len(arena_st.point)                # number of points/coins
+    nghost = arena_st.nghost                    # number of ghosts
+
+    file = open(filename)
+    file.readline()       # grid_size
+    file.readline()       # the map
+    while file.readline() != "":
+        file.readline()                         # time step
+        line = file.readline()                  # player
+        parts = line.strip().split(" ")
+        player = (int(parts[1]), int(parts[2]))
+        line = file.readline()                  # ghost
+        parts = line.strip().split(" ")
+        nghost = int(parts[1])
+        ghost_tup = ()
+        for i in range(nghost):
+            line = file.readline()
+            parts = line.strip().split(" ")
+            ghost_tup = ghost_tup + ((int(parts[0]), int(parts[1])),)
+
+        # Points
+        line = file.readline()                  # coins/points
+        point_tup = ()
+        for i in range(npoint):
+            line = file.readline()
+            parts = line.strip().split(" ")
+            if int(parts[0]) == 0:
+                point_tup = point_tup + ((-1, -1),)
+            else:
+                point_tup = point_tup + \
+                    ((int(parts[1]), int(parts[2])),)
+            state_tup = state_tup + (gstate(player, ghost_tup, point_tup),)
+            file.readline()
+    file.close()
+    return ([arena_st, state_tup], grid_size)
+
+
+def getTraj_old(startfileNum, fileNum):
 
     # getting the arena information
     arena_st, grid_size = getMap("./data/aimap5.txt")
@@ -179,18 +280,18 @@ def getTraj_old(startfileNum, fileNum, mapId):
         point_pos = ()
 
         while line:
-            line = f.readline()		# step number
-            line = f.readline()		# position of the player --- line
+            line = f.readline()     # step number
+            line = f.readline()     # position of the player --- line
             # ----------------
             print line[3], line[5]
             player = (int(line[3]), int(line[5]))  # position of player
             tralen = tralen + 1
             # ----------------
-            line = f.readline()			# number of ghost
-            line = f.readline()			# number of coins ---- line
+            line = f.readline()         # number of ghost
+            line = f.readline()         # number of coins ---- line
             if npoint == 0:
                 npoint = int(line[3])
-            point_pos = ()			# number of coins
+            point_pos = ()          # number of coins
             for point in range(npoint):
                 line = f.readline()
                 parts = line.strip().split(" ")
@@ -218,8 +319,8 @@ def getTraj_old(startfileNum, fileNum, mapId):
         print "Trajectory length: " + str(tralen)
 
         # for i in range(0, tralen):
-        # 	ftraj.append([xy2abs(ppos[i]),\
-        # 	getAction(ppos[i], ppos[i+1]), 0])
+        #   ftraj.append([xy2abs(ppos[i]),\
+        #   getAction(ppos[i], ppos[i+1]), 0])
 
         trajectories.append(state_tup)
         print "Parsed file: " + fname
